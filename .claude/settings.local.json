@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(tree:*)",
+      "Bash(dotnet sln:*)",
+      "Bash(dotnet new:*)",
+      "Bash(dotnet add reference:*)",
+      "Bash(dotnet add:*)",
+      "Bash(dotnet add package Microsoft.EntityFrameworkCore.Design --version 8.0.0)",
+      "Bash(dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL --version 8.0.0)",
+      "Bash(del /F \"backend\\src\\WMS.API\\nul\")",
+      "Bash(rm:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

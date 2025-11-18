@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(del /s /q WMS.APIbin WMS.APIobj WMS.Applicationbin WMS.Applicationobj WMS.Domainbin WMS.Domainobj WMS.Infrastructurebin WMS.Infrastructureobj)",
+      "Bash(rm:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet run)",
+      "Bash(taskkill:*)",
+      "Bash(nul)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

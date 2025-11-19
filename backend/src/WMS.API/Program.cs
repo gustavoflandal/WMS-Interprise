@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
+using WMS.API.Filters;
+using WMS.API.Middleware;
 using WMS.Application.Services;
 using WMS.Domain.Interfaces;
 using WMS.Infrastructure.Persistence;
@@ -27,7 +29,11 @@ try
     Log.Information("🚀 WMS Enterprise API starting...");
 
     // Add services
-    builder.Services.AddControllers()
+    builder.Services.AddControllers(options =>
+    {
+        // Register global validation filter
+        options.Filters.Add<ValidationExceptionFilter>();
+    })
         .AddApplicationPart(typeof(Program).Assembly)
         .AddControllersAsServices()
         .AddJsonOptions(options =>
@@ -109,21 +115,23 @@ try
     builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
     builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
     builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
-    
+    builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+
     // Unit of Work
     builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-    
+
     // Security & Authentication
     builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
     builder.Services.AddScoped<ITokenService, TokenService>();
     builder.Services.AddScoped<IPasswordService, PasswordService>();
     builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-    
+
     // Application Services
     builder.Services.AddScoped<IUserService, UserService>();
     builder.Services.AddScoped<IAuditService, AuditService>();
     builder.Services.AddScoped<ICompanyService, CompanyService>();
     builder.Services.AddScoped<IWarehouseService, WarehouseService>();
+    builder.Services.AddScoped<ICustomerService, CustomerService>();
 
     // AutoMapper
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -174,10 +182,13 @@ try
     }
 
     app.UseSerilogRequestLogging();
-    
+
+    // Exception handling middleware - deve estar ANTES de qualquer outro middleware que possa lançar exceções
+    app.UseMiddleware<ExceptionHandlingMiddleware>();
+
     // Desabilitar HTTPS redirect temporariamente para debug
     // app.UseHttpsRedirection();
-    
+
     app.UseCors("AllowFrontend");
     app.UseAuthentication();
     app.UseAuthorization();

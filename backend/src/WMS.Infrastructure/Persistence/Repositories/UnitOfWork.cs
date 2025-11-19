@@ -15,6 +15,7 @@ public class UnitOfWork : IUnitOfWork
     public IAuditLogRepository AuditLogs { get; }
     public ICompanyRepository Companies { get; }
     public IWarehouseRepository Warehouses { get; }
+    public ICustomerRepository Customers { get; }
 
     public UnitOfWork(
         ApplicationDbContext context,
@@ -24,7 +25,8 @@ public class UnitOfWork : IUnitOfWork
         ITenantRepository tenantRepository,
         IAuditLogRepository auditLogRepository,
         ICompanyRepository companyRepository,
-        IWarehouseRepository warehouseRepository)
+        IWarehouseRepository warehouseRepository,
+        ICustomerRepository customerRepository)
     {
         _context = context;
         Users = userRepository;
@@ -34,6 +36,7 @@ public class UnitOfWork : IUnitOfWork
         AuditLogs = auditLogRepository;
         Companies = companyRepository;
         Warehouses = warehouseRepository;
+        Customers = customerRepository;
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

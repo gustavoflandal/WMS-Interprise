@@ -9,6 +9,7 @@ public interface IUnitOfWork : IDisposable
     IAuditLogRepository AuditLogs { get; }
     ICompanyRepository Companies { get; }
     IWarehouseRepository Warehouses { get; }
+    ICustomerRepository Customers { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task BeginTransactionAsync(CancellationToken cancellationToken = default);

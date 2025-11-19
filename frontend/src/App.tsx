@@ -12,6 +12,7 @@ import { ActivitiesPage } from './pages/ActivitiesPage';
 import { PermissionsPage } from './pages/PermissionsPage';
 import { CompanyPage } from './pages/CompanyPage';
 import { WarehousePage } from './pages/WarehousePage';
+import { CustomerPage } from './pages/CustomerPage';
 import { MainLayout } from './components/layout/MainLayout';
 import { ProtectedRoute, AuthRoute } from './components/ProtectedRoute';
 
@@ -123,6 +124,7 @@ function App() {
               }
             >
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/customers" element={<CustomerPage />} />
               <Route path="/users/register" element={<UsersPage />} />
               <Route path="/users/activities" element={<ActivitiesPage />} />
               <Route path="/users/permissions" element={<PermissionsPage />} />

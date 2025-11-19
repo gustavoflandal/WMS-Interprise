@@ -22,7 +22,17 @@
       "Bash(docker-compose logs:*)",
       "Bash(docker-compose restart:*)",
       "Bash(curl:*)",
-      "Bash(docker exec:*)"
+      "Bash(docker exec:*)",
+      "Bash(dir:*)",
+      "Bash(dotnet build:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(dotnet ef database update:*)",
+      "Bash(dotnet ef migrations add:*)",
+      "Bash(git -C \"D:\\WMS-Interprise\" log --oneline -10)",
+      "Bash(git checkout:*)",
+      "Bash(dotnet restore:*)"
     ],
     "deny": [],
     "ask": []

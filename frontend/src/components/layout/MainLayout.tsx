@@ -80,12 +80,37 @@ export const MainLayout: React.FC = () => {
       color: '#2196f3',
     },
     {
+      label: 'Cadastros',
+      icon: <PersonAddIcon sx={{ color: '#4caf50' }} />,
+      color: '#4caf50',
+      submenu: [
+        {
+          label: 'Empresa',
+          icon: <BusinessIcon sx={{ color: '#00897b' }} />,
+          path: '/company',
+          color: '#00897b',
+        },
+        {
+          label: 'Armazéns',
+          icon: <WarehouseIcon sx={{ color: '#5e35b1' }} />,
+          path: '/warehouses',
+          color: '#5e35b1',
+        },
+        {
+          label: 'Clientes',
+          icon: <PeopleIcon sx={{ color: '#ff5722' }} />,
+          path: '/customers',
+          color: '#ff5722',
+        },
+      ],
+    },
+    {
       label: 'Usuários',
       icon: <PeopleIcon sx={{ color: '#9c27b0' }} />,
       color: '#9c27b0',
       submenu: [
         {
-          label: 'Cadastro',
+          label: 'Cadastrar',
           icon: <PersonAddIcon sx={{ color: '#4caf50' }} />,
           path: '/users/register',
           color: '#4caf50',
@@ -108,20 +133,7 @@ export const MainLayout: React.FC = () => {
       label: 'Configurações',
       icon: <SettingsIcon sx={{ color: '#607d8b' }} />,
       color: '#607d8b',
-      submenu: [
-        {
-          label: 'Empresa',
-          icon: <BusinessIcon sx={{ color: '#00897b' }} />,
-          path: '/company',
-          color: '#00897b',
-        },
-        {
-          label: 'Armazéns',
-          icon: <WarehouseIcon sx={{ color: '#5e35b1' }} />,
-          path: '/warehouses',
-          color: '#5e35b1',
-        },
-      ],
+      submenu: [],
     },
   ];
 
@@ -226,7 +238,7 @@ export const MainLayout: React.FC = () => {
                       }}
                       selected={location.pathname === subItem.path}
                       sx={{
-                        pl: 4,
+                        pl: 8,
                         '&.Mui-selected': {
                           backgroundColor: '#e3f2fd',
                           borderLeft: `4px solid ${subItem.color || '#1976d2'}`,

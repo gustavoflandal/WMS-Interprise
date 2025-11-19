@@ -13,6 +13,7 @@ diferentes formas de armazenamento e estruturas de armazenagem heterogêneas.
 O sistema WMS-Interprise foi consebido para permitir o rastreamento preciso de todas as movimentações
 físicas e fiscais, com um sistema de captura de logs que possibilita auditorias de todas as movimentações.
 Todas as operações são identificadas com o id do operador possíbilitando rastreamento e gestão dos procesos de qualidade.
+Todas as tarefas deverão passar por teste unitário, de interface e usabilidade antes de serem considerados como entregues.
 
 (1) Desenvolvimento de sistemas logísticos complexos, 
 (2) Código em .net 10 para alta performance, 

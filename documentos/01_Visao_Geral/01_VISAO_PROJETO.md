@@ -12,7 +12,17 @@
 
 ## 1. Resumo Executivo
 
-O WMS Enterprise é um sistema de gerenciamento de armazém de última geração, projetado para atender as necessidades de operações logísticas complexas e de grande porte. O sistema foi concebido para gerenciar múltiplos depositantes, várias categorias de produtos, diferentes formas de armazenamento e estruturas de armazenagem heterogêneas.
+O WMS Enterprise é um sistema de gerenciamento de armazém de última geração, 
+projetado para atender as necessidades de operações logísticas complexas e de grande porte. 
+É um sistema multi armazens que permite a gestão individual ou unificada de vários armazens (werehauses).
+Permite a criação e gerenciamento de multiplos estoques com características diversas, possibilitando
+a gestão do fluxo de mercadorias entre todos de forma organizada e robusta.
+Permite ainda gerenciar múltiplos depositantes, várias categorias de produtos, 
+diferentes formas de armazenamento e estruturas de armazenagem heterogêneas.
+O sistema WMS-Interprise foi consebido para permitir o rastreamento preciso de todas as movimentações
+físicas e fiscais, com um sistema de captura de logs que possibilita auditorias de todas as movimentações.
+Todas as operações são identificadas com o id do operador possíbilitando rastreamento e gestão dos procesos de qualidade.
+
 
 ### Valor de Negócio
 

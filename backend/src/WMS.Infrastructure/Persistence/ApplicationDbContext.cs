@@ -17,6 +17,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<Tenant> Tenants => Set<Tenant>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<Company> Companies => Set<Company>();
+    public DbSet<Warehouse> Warehouses => Set<Warehouse>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

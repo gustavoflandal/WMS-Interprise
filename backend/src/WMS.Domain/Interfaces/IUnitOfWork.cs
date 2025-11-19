@@ -7,6 +7,8 @@ public interface IUnitOfWork : IDisposable
     IPermissionRepository Permissions { get; }
     ITenantRepository Tenants { get; }
     IAuditLogRepository AuditLogs { get; }
+    ICompanyRepository Companies { get; }
+    IWarehouseRepository Warehouses { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task BeginTransactionAsync(CancellationToken cancellationToken = default);

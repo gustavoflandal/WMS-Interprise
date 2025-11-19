@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "WMS PostgreSQL",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "wms_dev",
+      "Username": "wms_user",
+      "SSLMode": "prefer",
+      "PassFile": "/tmp/pgpassfile"
+    }
+  }
+}

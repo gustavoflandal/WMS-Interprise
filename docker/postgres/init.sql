@@ -8,8 +8,9 @@ CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 CREATE SCHEMA IF NOT EXISTS wms;
 CREATE SCHEMA IF NOT EXISTS audit;
 
--- Set default search path
-ALTER DATABASE "WMS_Interprise" SET search_path TO wms, public;
+-- Set default search path (commented out - use session level instead)
+-- ALTER DATABASE "WMS_Interprise" SET search_path TO wms, public;
+SET search_path TO wms, public;
 
 -- Create audit log table
 CREATE TABLE IF NOT EXISTS audit.audit_log (

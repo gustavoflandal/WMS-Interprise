@@ -29,7 +29,13 @@ try
     // Add services
     builder.Services.AddControllers()
         .AddApplicationPart(typeof(Program).Assembly)
-        .AddControllersAsServices();
+        .AddControllersAsServices()
+        .AddJsonOptions(options =>
+        {
+            // Configure JSON serialization to use camelCase
+            options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+            options.JsonSerializerOptions.DictionaryKeyPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+        });
     //builder.Services.AddOpenApi();
 
     // Database
@@ -101,6 +107,8 @@ try
     builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
     builder.Services.AddScoped<ITenantRepository, TenantRepository>();
     builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+    builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+    builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
     
     // Unit of Work
     builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -114,6 +122,8 @@ try
     // Application Services
     builder.Services.AddScoped<IUserService, UserService>();
     builder.Services.AddScoped<IAuditService, AuditService>();
+    builder.Services.AddScoped<ICompanyService, CompanyService>();
+    builder.Services.AddScoped<IWarehouseService, WarehouseService>();
 
     // AutoMapper
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

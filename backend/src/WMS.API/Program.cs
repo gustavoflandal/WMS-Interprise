@@ -107,15 +107,25 @@ try
     });
 
     // Services
-    // Repositories
+    // Repositories - Autenticação e Autorização
     builder.Services.AddScoped<IUserRepository, UserRepository>();
     builder.Services.AddScoped<IRoleRepository, RoleRepository>();
     builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
     builder.Services.AddScoped<ITenantRepository, TenantRepository>();
+
+    // Repositories - Auditoria
     builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+
+    // Repositories - Dados Mestres
     builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
     builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
     builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+
+    // Repositories - Recebimento (RF-001)
+    builder.Services.AddScoped<IProductRepository, ProductRepository>();
+    builder.Services.AddScoped<IStorageLocationRepository, StorageLocationRepository>();
+    builder.Services.AddScoped<IASNRepository, ASNRepository>();
+    builder.Services.AddScoped<IReceiptRepository, ReceiptRepository>();
 
     // Unit of Work
     builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

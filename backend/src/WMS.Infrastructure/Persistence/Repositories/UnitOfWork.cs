@@ -8,14 +8,25 @@ public class UnitOfWork : IUnitOfWork
     private readonly ApplicationDbContext _context;
     private IDbContextTransaction? _transaction;
 
+    // Autenticação e Autorização
     public IUserRepository Users { get; }
     public IRoleRepository Roles { get; }
     public IPermissionRepository Permissions { get; }
     public ITenantRepository Tenants { get; }
+
+    // Auditoria
     public IAuditLogRepository AuditLogs { get; }
+
+    // Dados Mestres
     public ICompanyRepository Companies { get; }
     public IWarehouseRepository Warehouses { get; }
     public ICustomerRepository Customers { get; }
+
+    // Recebimento (RF-001)
+    public IProductRepository Products { get; }
+    public IStorageLocationRepository StorageLocations { get; }
+    public IASNRepository ASNs { get; }
+    public IReceiptRepository Receipts { get; }
 
     public UnitOfWork(
         ApplicationDbContext context,
@@ -26,7 +37,11 @@ public class UnitOfWork : IUnitOfWork
         IAuditLogRepository auditLogRepository,
         ICompanyRepository companyRepository,
         IWarehouseRepository warehouseRepository,
-        ICustomerRepository customerRepository)
+        ICustomerRepository customerRepository,
+        IProductRepository productRepository,
+        IStorageLocationRepository storageLocationRepository,
+        IASNRepository asnRepository,
+        IReceiptRepository receiptRepository)
     {
         _context = context;
         Users = userRepository;
@@ -37,6 +52,10 @@ public class UnitOfWork : IUnitOfWork
         Companies = companyRepository;
         Warehouses = warehouseRepository;
         Customers = customerRepository;
+        Products = productRepository;
+        StorageLocations = storageLocationRepository;
+        ASNs = asnRepository;
+        Receipts = receiptRepository;
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

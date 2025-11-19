@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
+using WMS.API.Filters;
+using WMS.API.Middleware;
 using WMS.Application.Services;
 using WMS.Domain.Interfaces;
 using WMS.Infrastructure.Persistence;
@@ -27,7 +29,11 @@ try
     Log.Information("🚀 WMS Enterprise API starting...");
 
     // Add services
-    builder.Services.AddControllers()
+    builder.Services.AddControllers(options =>
+    {
+        // Register global validation filter
+        options.Filters.Add<ValidationExceptionFilter>();
+    })
         .AddApplicationPart(typeof(Program).Assembly)
         .AddControllersAsServices()
         .AddJsonOptions(options =>
@@ -101,29 +107,47 @@ try
     });
 
     // Services
-    // Repositories
+    // Repositories - Autenticação e Autorização
     builder.Services.AddScoped<IUserRepository, UserRepository>();
     builder.Services.AddScoped<IRoleRepository, RoleRepository>();
     builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
     builder.Services.AddScoped<ITenantRepository, TenantRepository>();
+
+    // Repositories - Auditoria
     builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+
+    // Repositories - Dados Mestres
     builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
     builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
-    
+    builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+
+    // Repositories - Recebimento (RF-001)
+    builder.Services.AddScoped<IProductRepository, ProductRepository>();
+    builder.Services.AddScoped<IStorageLocationRepository, StorageLocationRepository>();
+    builder.Services.AddScoped<IASNRepository, ASNRepository>();
+    builder.Services.AddScoped<IReceiptRepository, ReceiptRepository>();
+
     // Unit of Work
     builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-    
+
     // Security & Authentication
     builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
     builder.Services.AddScoped<ITokenService, TokenService>();
     builder.Services.AddScoped<IPasswordService, PasswordService>();
     builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-    
+
     // Application Services
     builder.Services.AddScoped<IUserService, UserService>();
     builder.Services.AddScoped<IAuditService, AuditService>();
     builder.Services.AddScoped<ICompanyService, CompanyService>();
     builder.Services.AddScoped<IWarehouseService, WarehouseService>();
+    builder.Services.AddScoped<ICustomerService, CustomerService>();
+
+    // Receiving Module Services (RF-001)
+    builder.Services.AddScoped<IProductService, ProductService>();
+    builder.Services.AddScoped<IASNService, ASNService>();
+    builder.Services.AddScoped<IReceiptService, ReceiptService>();
+    builder.Services.AddScoped<IStorageLocationService, StorageLocationService>();
 
     // AutoMapper
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -174,10 +198,13 @@ try
     }
 
     app.UseSerilogRequestLogging();
-    
+
+    // Exception handling middleware - deve estar ANTES de qualquer outro middleware que possa lançar exceções
+    app.UseMiddleware<ExceptionHandlingMiddleware>();
+
     // Desabilitar HTTPS redirect temporariamente para debug
     // app.UseHttpsRedirection();
-    
+
     app.UseCors("AllowFrontend");
     app.UseAuthentication();
     app.UseAuthorization();

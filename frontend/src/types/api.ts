@@ -77,3 +77,36 @@ export interface PaginatedResponse<T> {
   pageSize: number;
   totalPages: number;
 }
+
+// ============================================================================
+// Types para Customer
+// ============================================================================
+
+export interface Customer {
+  id: string;
+  nome: string;
+  tipo: 'PJ' | 'PF';
+  numeroDocumento?: string;
+  email?: string;
+  telefone?: string;
+  status: 'Ativo' | 'Inativo' | 'Bloqueado';
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CreateCustomerRequest {
+  nome: string;
+  tipo: 'PJ' | 'PF';
+  numeroDocumento?: string;
+  email?: string;
+  telefone?: string;
+}
+
+export interface UpdateCustomerRequest {
+  nome?: string;
+  tipo?: 'PJ' | 'PF';
+  numeroDocumento?: string;
+  email?: string;
+  telefone?: string;
+  status?: 'Ativo' | 'Inativo' | 'Bloqueado';
+}

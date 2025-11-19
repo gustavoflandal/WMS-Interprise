@@ -247,6 +247,95 @@ public class DatabaseSeeder
             await _dbContext.SaveChangesAsync();
             _logger.LogInformation("✅ Test warehouse created (Code: SP-01)");
 
+            // 10. Criar clientes de teste
+            var customers = new List<Customer>
+            {
+                new Customer(
+                    tenantId: defaultTenant.Id,
+                    nome: "Empresa ABC Comércio Ltda",
+                    tipo: "PJ",
+                    numeroDocumento: "12.345.678/0001-90",
+                    email: "contato@abccomercio.com.br",
+                    telefone: "(11) 3456-7890"
+                ),
+                new Customer(
+                    tenantId: defaultTenant.Id,
+                    nome: "Indústria XYZ Manufatura S/A",
+                    tipo: "PJ",
+                    numeroDocumento: "98.765.432/0001-12",
+                    email: "vendas@xyzmanufatura.com.br",
+                    telefone: "(31) 2588-9900"
+                ),
+                new Customer(
+                    tenantId: defaultTenant.Id,
+                    nome: "Logística Global Transportes Ltda",
+                    tipo: "PJ",
+                    numeroDocumento: "55.444.333/0001-44",
+                    email: "logistica@globaltransportes.com.br",
+                    telefone: "(21) 3334-5555"
+                ),
+                new Customer(
+                    tenantId: defaultTenant.Id,
+                    nome: "Varejo Premium Distribuidora",
+                    tipo: "PJ",
+                    numeroDocumento: "77.888.999/0001-55",
+                    email: "compras@varejopremium.com.br",
+                    telefone: "(85) 3333-4444"
+                ),
+                new Customer(
+                    tenantId: defaultTenant.Id,
+                    nome: "Fernando Silva Santos",
+                    tipo: "PF",
+                    numeroDocumento: "123.456.789-00",
+                    email: "fernando.silva@email.com",
+                    telefone: "(11) 99999-8888"
+                ),
+                new Customer(
+                    tenantId: defaultTenant.Id,
+                    nome: "Tech Solutions Brasil Consultoria",
+                    tipo: "PJ",
+                    numeroDocumento: "11.222.333/0001-66",
+                    email: "info@techsolutions.com.br",
+                    telefone: "(11) 2222-3333"
+                ),
+                new Customer(
+                    tenantId: defaultTenant.Id,
+                    nome: "E-commerce Virtual Store Ltda",
+                    tipo: "PJ",
+                    numeroDocumento: "44.555.666/0001-77",
+                    email: "suporte@ecommercestore.com.br",
+                    telefone: "(47) 3344-5566"
+                ),
+                new Customer(
+                    tenantId: defaultTenant.Id,
+                    nome: "Marisa Silva Costa",
+                    tipo: "PF",
+                    numeroDocumento: "987.654.321-11",
+                    email: "marisa.costa@email.com",
+                    telefone: "(21) 98888-7777"
+                ),
+                new Customer(
+                    tenantId: defaultTenant.Id,
+                    nome: "Alimentos Premium Distribuição",
+                    tipo: "PJ",
+                    numeroDocumento: "33.666.999/0001-88",
+                    email: "pedidos@alimentospremium.com.br",
+                    telefone: "(41) 3333-4444"
+                ),
+                new Customer(
+                    tenantId: defaultTenant.Id,
+                    nome: "João Pedro Oliveira Ferreira",
+                    tipo: "PF",
+                    numeroDocumento: "456.789.123-22",
+                    email: "joao.ferreira@email.com",
+                    telefone: "(62) 99999-1111"
+                )
+            };
+
+            await _dbContext.Customers.AddRangeAsync(customers);
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("✅ 10 test customers created");
+
             _logger.LogInformation("✅ Database seeding completed successfully");
         }
         catch (Exception ex)

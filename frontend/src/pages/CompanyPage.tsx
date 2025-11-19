@@ -459,8 +459,8 @@ export const CompanyPage: React.FC = () => {
                     onChange={(e) => handleSelectChange('estado', e.target.value)}
                   >
                     {brazilianStates.map((state) => (
-                      <MenuItem key={state.value} value={state.value}>
-                        {state.value}
+                      <MenuItem key={state.uf} value={state.uf}>
+                        {state.uf}
                       </MenuItem>
                     ))}
                   </Select>

@@ -33,6 +33,9 @@ import {
   Security as SecurityIcon,
   Business as BusinessIcon,
   Warehouse as WarehouseIcon,
+  Inventory as InventoryIcon,
+  Shield as ShieldIcon,
+  LocalShipping as LocalShippingIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -80,34 +83,9 @@ export const MainLayout: React.FC = () => {
       color: '#2196f3',
     },
     {
-      label: 'Usuários',
-      icon: <PeopleIcon sx={{ color: '#9c27b0' }} />,
-      color: '#9c27b0',
-      submenu: [
-        {
-          label: 'Cadastro',
-          icon: <PersonAddIcon sx={{ color: '#4caf50' }} />,
-          path: '/users/register',
-          color: '#4caf50',
-        },
-        {
-          label: 'Atividades',
-          icon: <HistoryIcon sx={{ color: '#ff9800' }} />,
-          path: '/users/activities',
-          color: '#ff9800',
-        },
-        {
-          label: 'Permissões',
-          icon: <SecurityIcon sx={{ color: '#f44336' }} />,
-          path: '/users/permissions',
-          color: '#f44336',
-        },
-      ],
-    },
-    {
-      label: 'Configurações',
-      icon: <SettingsIcon sx={{ color: '#607d8b' }} />,
-      color: '#607d8b',
+      label: 'Cadastros',
+      icon: <PersonAddIcon sx={{ color: '#4caf50' }} />,
+      color: '#4caf50',
       submenu: [
         {
           label: 'Empresa',
@@ -121,7 +99,67 @@ export const MainLayout: React.FC = () => {
           path: '/warehouses',
           color: '#5e35b1',
         },
+        {
+          label: 'Clientes',
+          icon: <PeopleIcon sx={{ color: '#ff5722' }} />,
+          path: '/customers',
+          color: '#ff5722',
+        },
+        {
+          label: 'Produtos',
+          icon: <InventoryIcon sx={{ color: '#ff9800' }} />,
+          path: '/products',
+          color: '#ff9800',
+        },
       ],
+    },
+    {
+      label: 'Recebimento',
+      icon: <LocalShippingIcon sx={{ color: '#00bcd4' }} />,
+      color: '#00bcd4',
+      submenu: [
+        {
+          label: 'ASN (Avisos de Remessa)',
+          icon: <LocalShippingIcon sx={{ color: '#00acc1' }} />,
+          path: '/asn',
+          color: '#00acc1',
+        },
+      ],
+    },
+    {
+      label: 'Usuários',
+      icon: <PeopleIcon sx={{ color: '#9c27b0' }} />,
+      color: '#9c27b0',
+      submenu: [
+        {
+          label: 'Cadastrar',
+          icon: <PersonAddIcon sx={{ color: '#4caf50' }} />,
+          path: '/users/register',
+          color: '#4caf50',
+        },
+        {
+          label: 'Atividades',
+          icon: <HistoryIcon sx={{ color: '#ff9800' }} />,
+          path: '/users/activities',
+          color: '#ff9800',
+        },
+        {          label: 'Papéis/Funções',
+          icon: <ShieldIcon sx={{ color: '#ff9800' }} />,
+          path: '/users/roles',
+          color: '#ff9800',
+        },
+        {          label: 'Permissões',
+          icon: <SecurityIcon sx={{ color: '#f44336' }} />,
+          path: '/users/permissions',
+          color: '#f44336',
+        },
+      ],
+    },
+    {
+      label: 'Configurações',
+      icon: <SettingsIcon sx={{ color: '#607d8b' }} />,
+      color: '#607d8b',
+      submenu: [],
     },
   ];
 
@@ -226,7 +264,7 @@ export const MainLayout: React.FC = () => {
                       }}
                       selected={location.pathname === subItem.path}
                       sx={{
-                        pl: 4,
+                        pl: 8,
                         '&.Mui-selected': {
                           backgroundColor: '#e3f2fd',
                           borderLeft: `4px solid ${subItem.color || '#1976d2'}`,

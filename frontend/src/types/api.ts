@@ -51,6 +51,7 @@ export interface UpdateUserRequest {
   firstName?: string;
   lastName?: string;
   phone?: string;
+  isActive?: boolean;
 }
 
 export interface ChangePasswordRequest {

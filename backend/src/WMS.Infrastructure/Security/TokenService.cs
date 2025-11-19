@@ -29,6 +29,7 @@ public class TokenService : ITokenService
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Email, user.Email),
             new(ClaimTypes.Name, user.GetFullName()),
+            new("tenant_id", user.TenantId.ToString()),
         };
 
         // Add roles

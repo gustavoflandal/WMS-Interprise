@@ -107,10 +107,11 @@ public class UsersController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserRequest request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Updating user: {UserId}", id);
+        _logger.LogInformation("Updating user: {UserId} with data: {@Request}", id, request);
 
         if (!ModelState.IsValid)
         {
+            _logger.LogWarning("Invalid ModelState: {@ModelState}", ModelState);
             return BadRequest(ModelState);
         }
 

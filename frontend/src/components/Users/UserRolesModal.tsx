@@ -14,6 +14,8 @@ import {
   Alert,
   IconButton,
   Chip,
+  Switch,
+  Divider,
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -36,6 +38,14 @@ export const UserRolesModal: React.FC<UserRolesModalProps> = ({
 }) => {
   const queryClient = useQueryClient();
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [isActive, setIsActive] = useState<boolean>(true);
+
+  // Buscar dados do usuário
+  const { data: userData, isLoading: userLoading } = useQuery({
+    queryKey: ['user', userId],
+    queryFn: () => userService.getById(userId),
+    enabled: open && !!userId,
+  });
 
   // Buscar todos os roles disponíveis
   const { data: availableRoles = [], isLoading: rolesLoading } = useQuery({
@@ -54,7 +64,12 @@ export const UserRolesModal: React.FC<UserRolesModalProps> = ({
   useEffect(() => {
     if (!open) {
       setSelectedRoles([]);
+      setIsActive(true);
       return;
+    }
+    
+    if (userData) {
+      setIsActive(userData.isActive);
     }
     
     if (userRoles && userRoles.length > 0) {
@@ -63,7 +78,7 @@ export const UserRolesModal: React.FC<UserRolesModalProps> = ({
     } else if (userRoles && userRoles.length === 0) {
       setSelectedRoles([]);
     }
-  }, [open, userId]); // Removido userRoles da dependência
+  }, [open, userId, userData]); // Removido userRoles da dependência
 
   // Atualizar selectedRoles quando userRoles mudar, mas apenas se já tiver carregado
   useEffect(() => {
@@ -91,6 +106,19 @@ export const UserRolesModal: React.FC<UserRolesModalProps> = ({
     },
   });
 
+  const updateUserStatusMutation = useMutation({
+    mutationFn: (isActive: boolean) => 
+      userService.update(userId, { isActive }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['user', userId] });
+      toast.success(`Usuário ${isActive ? 'ativado' : 'desativado'} com sucesso!`);
+    },
+    onError: () => {
+      toast.error('Erro ao atualizar status do usuário');
+    },
+  });
+
   const handleRoleToggle = (roleId: string) => {
     setSelectedRoles(prev =>
       prev.includes(roleId)
@@ -99,11 +127,16 @@ export const UserRolesModal: React.FC<UserRolesModalProps> = ({
     );
   };
 
+  const handleStatusToggle = (checked: boolean) => {
+    setIsActive(checked);
+    updateUserStatusMutation.mutate(checked);
+  };
+
   const handleSubmit = () => {
     assignRolesMutation.mutate(selectedRoles);
   };
 
-  const isLoading = rolesLoading || userRolesLoading || assignRolesMutation.isPending;
+  const isLoading = rolesLoading || userRolesLoading || assignRolesMutation.isPending || userLoading || updateUserStatusMutation.isPending;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -132,6 +165,49 @@ export const UserRolesModal: React.FC<UserRolesModalProps> = ({
       </DialogTitle>
 
       <DialogContent dividers>
+        {/* Checkbox de Ativar/Desativar Usuário */}
+        <Box
+          sx={{
+            p: 2,
+            mb: 3,
+            border: '2px solid',
+            borderColor: isActive ? 'success.main' : 'error.main',
+            borderRadius: 2,
+            backgroundColor: isActive ? 'success.light' : 'error.light',
+            opacity: isActive ? 1 : 0.7,
+          }}
+        >
+          <FormControlLabel
+            control={
+              <Switch
+                checked={isActive}
+                onChange={(e) => handleStatusToggle(e.target.checked)}
+                disabled={isLoading}
+                color={isActive ? 'success' : 'error'}
+              />
+            }
+            label={
+              <Box>
+                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                  {isActive ? '✅ Usuário Ativo' : '❌ Usuário Inativo'}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {isActive 
+                    ? 'O usuário pode acessar o sistema' 
+                    : 'O usuário não pode acessar o sistema'}
+                </Typography>
+              </Box>
+            }
+            sx={{ width: '100%', m: 0 }}
+          />
+        </Box>
+
+        <Divider sx={{ mb: 2 }}>
+          <Typography variant="caption" color="text.secondary">
+            ROLES DO USUÁRIO
+          </Typography>
+        </Divider>
+
         {rolesLoading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
             <CircularProgress />

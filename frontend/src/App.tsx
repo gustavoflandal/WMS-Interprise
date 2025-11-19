@@ -10,6 +10,8 @@ import { Dashboard } from './pages/DashboardPage';
 import { UsersPage } from './pages/UsersPage';
 import { ActivitiesPage } from './pages/ActivitiesPage';
 import { PermissionsPage } from './pages/PermissionsPage';
+import { CompanyPage } from './pages/CompanyPage';
+import { WarehousePage } from './pages/WarehousePage';
 import { MainLayout } from './components/layout/MainLayout';
 import { ProtectedRoute, AuthRoute } from './components/ProtectedRoute';
 
@@ -124,6 +126,8 @@ function App() {
               <Route path="/users/register" element={<UsersPage />} />
               <Route path="/users/activities" element={<ActivitiesPage />} />
               <Route path="/users/permissions" element={<PermissionsPage />} />
+              <Route path="/company" element={<CompanyPage />} />
+              <Route path="/warehouses" element={<WarehousePage />} />
             </Route>
 
             {/* Redirect padrão */}

@@ -25,6 +25,74 @@ version: '3.9'
 
 services:
   # =========================================================================
+  # DATABASE - PostgreSQL 16 (OLTP Database)
+  # =========================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: wms-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-wms_dev}
+      POSTGRES_USER: ${DB_USER:-wms_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-wms_password_dev}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - wms-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-wms_user} -d ${DB_NAME:-wms_dev}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # =========================================================================
+  # DATABASE GUI - pgAdmin 4 (PostgreSQL Management)
+  # =========================================================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: wms-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@wms.dev}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json:ro
+    networks:
+      - wms-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80/misc/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+  # =========================================================================
   # CACHE - Redis 7 (Cluster Mode - Single Node para Dev)
   # =========================================================================
   redis:
@@ -337,41 +405,46 @@ services:
           memory: 128M
 
   # =========================================================================
-  # BACKEND API - Go/Gin Application
+  # BACKEND API - .NET 10 Application
   # =========================================================================
-  backend:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-    container_name: wms-backend
-    restart: unless-stopped
-    ports:
-      - "8090:8090"
-    environment:
-      ENV: development
-      API_PORT: 8090
-      JWT_SECRET: ${JWT_SECRET:-dev-secret-key-change-in-production}
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: ${DB_USER:-wms_user}
-      DB_PASSWORD: ${DB_PASSWORD:-wms_password_dev}
-      DB_NAME: ${DB_NAME:-wms_dev}
-      LOG_LEVEL: debug
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - wms-network
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8090/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  # NOTE: Backend service commented out until Dockerfile is created
+  # Uncomment and configure after backend is ready
+  #
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: wms-backend
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8090:8090"
+  #   environment:
+  #     ASPNETCORE_ENVIRONMENT: Development
+  #     ASPNETCORE_URLS: http://+:8090
+  #     ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${DB_NAME:-wms_dev};Username=${DB_USER:-wms_user};Password=${DB_PASSWORD:-wms_password_dev}"
+  #     ConnectionStrings__Redis: "redis:6379"
+  #     JWT_SECRET: ${JWT_SECRET:-dev-secret-key-change-in-production}
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   networks:
+  #     - wms-network
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8090/health"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
 
 # ============================================================================
 # VOLUMES - Persistent Storage
 # ============================================================================
 volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
   redis_data:
     driver: local
   elasticsearch_data:
@@ -381,8 +454,6 @@ volumes:
   prometheus_data:
     driver: local
   grafana_data:
-    driver: local
-  pgadmin_data:
     driver: local
   loki_data:
     driver: local

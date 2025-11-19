@@ -3,16 +3,19 @@ using WMS.Application.DTOs.Requests;
 using WMS.Application.DTOs.Responses;
 using WMS.Domain.Interfaces;
 using WMS.Domain.Entities;
+using WMS.Shared.Interfaces;
 
 namespace WMS.Application.Services;
 
 public class UserService : IUserService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IPasswordService _passwordService;
 
-    public UserService(IUnitOfWork unitOfWork)
+    public UserService(IUnitOfWork unitOfWork, IPasswordService passwordService)
     {
         _unitOfWork = unitOfWork;
+        _passwordService = passwordService;
     }
 
     public async Task<Result<UserResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -77,12 +80,18 @@ public class UserService : IUserService
             return Result<UserResponse>.Failure("Email already exists");
         }
 
-        // Note: Password hashing should be handled by AuthenticationService
-        // This is just for creating a user with basic data
+        // Hash password
+        if (string.IsNullOrWhiteSpace(request.Password))
+        {
+            return Result<UserResponse>.Failure("Password is required");
+        }
+
+        var passwordHash = _passwordService.HashPassword(request.Password);
+
         var newUser = new User(
             username: request.Username,
             email: request.Email,
-            passwordHash: "",  // Empty hash - should be set via AuthenticationService
+            passwordHash: passwordHash,
             firstName: request.FirstName ?? "",
             lastName: request.LastName ?? "",
             phone: request.Phone
@@ -117,11 +126,28 @@ public class UserService : IUserService
             return Result<UserResponse>.Failure("User not found");
         }
 
-        user.UpdateProfile(
-            firstName: request.FirstName ?? user.FirstName,
-            lastName: request.LastName ?? user.LastName,
-            phone: request.Phone
-        );
+        // Atualizar perfil se os campos foram fornecidos
+        if (request.FirstName != null || request.LastName != null || request.Phone != null)
+        {
+            user.UpdateProfile(
+                firstName: request.FirstName ?? user.FirstName,
+                lastName: request.LastName ?? user.LastName,
+                phone: request.Phone ?? user.Phone
+            );
+        }
+
+        // Atualizar status de ativação
+        if (request.IsActive.HasValue)
+        {
+            if (request.IsActive.Value)
+            {
+                user.Activate();
+            }
+            else
+            {
+                user.Deactivate();
+            }
+        }
 
         await _unitOfWork.Users.UpdateAsync(user, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

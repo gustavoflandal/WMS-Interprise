@@ -5,7 +5,10 @@
 ### 1.1 Tipos de Depositantes
 
 O sistema suporta diferentes modelos operacionais:
-
+- **Multiplos Armazens:** Permite a criação e gerenciamento individual ou unificado de vários armazens.
+- **Multiplos estoques:** Permite a criação em cada armazem, de multiplos estoques cada qual com 
+                          suas características físicas e de controle.
+- **Movimentação de produtos :** Permite a transferencia de produtos entre armazéns e entre estoques.
 - **3PL (Third Party Logistics):** Gerencia múltiplos clientes com dados isolados
 - **Operação Própria:** Gerencia inventário de uma única corporação
 - **Cross-Docking:** Processamento de produtos sem armazenagem prolongada

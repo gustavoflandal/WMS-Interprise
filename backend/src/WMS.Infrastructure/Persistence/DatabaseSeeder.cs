@@ -86,6 +86,16 @@ public class DatabaseSeeder
                 new("roles.edit", "Roles", "Edit", "Permissão para editar papel", "Administration"),
                 new("roles.delete", "Roles", "Delete", "Permissão para deletar papel", "Administration"),
 
+                new("companies.view", "Companies", "View", "Permissão para visualizar dados da empresa", "Administration"),
+                new("companies.create", "Companies", "Create", "Permissão para criar empresa", "Administration"),
+                new("companies.edit", "Companies", "Edit", "Permissão para editar dados da empresa", "Administration"),
+                new("companies.delete", "Companies", "Delete", "Permissão para deletar empresa", "Administration"),
+
+                new("warehouses.view", "Warehouses", "View", "Permissão para visualizar armazéns", "Administration"),
+                new("warehouses.create", "Warehouses", "Create", "Permissão para criar armazém", "Administration"),
+                new("warehouses.edit", "Warehouses", "Edit", "Permissão para editar armazém", "Administration"),
+                new("warehouses.delete", "Warehouses", "Delete", "Permissão para deletar armazém", "Administration"),
+
                 new("inventory.view", "Inventory", "View", "Permissão para visualizar inventário", "Inventory"),
                 new("inventory.manage", "Inventory", "Manage", "Permissão para gerenciar inventário", "Inventory"),
 
@@ -158,6 +168,84 @@ public class DatabaseSeeder
             await _dbContext.UserRoles.AddAsync(testUserRole);
             await _dbContext.SaveChangesAsync();
             _logger.LogInformation("✅ Test user created (username: testuser, password: Test@123)");
+
+            // 8. Criar empresa de teste
+            var testCompany = new Company(
+                tenantId: defaultTenant.Id,
+                razaoSocial: "WMS Interprise Logística Ltda",
+                cnpj: "12.345.678/0001-90",
+                email: "contato@wmsinterprise.com.br",
+                cep: "01310-100",
+                logradouro: "Avenida Paulista",
+                numero: "1578",
+                bairro: "Bela Vista",
+                cidade: "São Paulo",
+                estado: "SP",
+                nomeResponsavel: "João Silva",
+                cpfResponsavel: "123.456.789-00",
+                emailResponsavel: "joao.silva@wmsinterprise.com.br"
+            );
+
+            testCompany.UpdateInfo(
+                nomeFantasia: "WMS Interprise",
+                inscricaoEstadual: "123.456.789.012",
+                inscricaoMunicipal: "987654321",
+                email: "contato@wmsinterprise.com.br",
+                telefone: "(11) 3456-7890",
+                celular: "(11) 98765-4321",
+                website: "https://www.wmsinterprise.com.br",
+                cep: "01310-100",
+                logradouro: "Avenida Paulista",
+                numero: "1578",
+                complemento: "Conjunto 1501",
+                bairro: "Bela Vista",
+                cidade: "São Paulo",
+                estado: "SP",
+                dataAbertura: new DateTime(2020, 1, 15),
+                capitalSocial: 500000.00m,
+                atividadePrincipal: "6204-0/00 - Consultoria em tecnologia da informação",
+                regimeTributario: "Lucro Presumido",
+                nomeResponsavel: "João Silva",
+                cpfResponsavel: "123.456.789-00",
+                cargoResponsavel: "Diretor Executivo",
+                emailResponsavel: "joao.silva@wmsinterprise.com.br",
+                telefoneResponsavel: "(11) 99876-5432"
+            );
+
+            testCompany.UpdateTimestamp("system");
+            await _dbContext.Companies.AddAsync(testCompany);
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("✅ Test company created (CNPJ: 12.345.678/0001-90)");
+
+            // 9. Criar armazém de teste
+            var testWarehouse = new Warehouse(
+                tenantId: defaultTenant.Id,
+                nome: "Armazém Principal - São Paulo",
+                codigo: "SP-01",
+                descricao: "Armazém principal localizado em São Paulo, com capacidade para 10.000 posições"
+            );
+
+            testWarehouse.UpdateInfo(
+                nome: "Armazém Principal - São Paulo",
+                descricao: "Armazém principal localizado em São Paulo, com capacidade para 10.000 posições",
+                endereco: "Rua dos Galpões Industriais, 1000",
+                cidade: "São Paulo",
+                estado: "SP",
+                cep: "08295-005",
+                pais: "BRA",
+                latitude: -23.4901m,
+                longitude: -46.5693m,
+                totalPosicoes: 10000,
+                capacidadePesoTotal: 500000.00m, // 500 toneladas
+                horarioAbertura: new TimeSpan(6, 0, 0), // 06:00
+                horarioFechamento: new TimeSpan(22, 0, 0), // 22:00
+                maxTrabalhadores: 50
+            );
+
+            testWarehouse.UpdateTimestamp("system");
+            await _dbContext.Warehouses.AddAsync(testWarehouse);
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("✅ Test warehouse created (Code: SP-01)");
 
             _logger.LogInformation("✅ Database seeding completed successfully");
         }

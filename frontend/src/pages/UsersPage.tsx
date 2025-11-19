@@ -29,6 +29,8 @@ import {
   Search as SearchIcon,
   Restore as RestoreIcon,
   Security as SecurityIcon,
+  Visibility,
+  VisibilityOff,
 } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { userService } from '../services/api/userApi';
@@ -43,6 +45,7 @@ import { UserRolesModal } from '../components/Users/UserRolesModal';
 interface UserFormData {
   username: string;
   email: string;
+  password: string;
   firstName: string;
   lastName: string;
   phone?: string;
@@ -66,16 +69,20 @@ const UserModal: React.FC<UserModalProps> = ({
   const [formData, setFormData] = useState<UserFormData>({
     username: '',
     email: '',
+    password: '',
     firstName: '',
     lastName: '',
     phone: '',
   });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (initialData) {
       setFormData({
         username: initialData.username,
         email: initialData.email,
+        password: '', // Senha não é carregada para edição
         firstName: initialData.firstName,
         lastName: initialData.lastName,
         phone: initialData.phone || '',
@@ -84,11 +91,13 @@ const UserModal: React.FC<UserModalProps> = ({
       setFormData({
         username: '',
         email: '',
+        password: '',
         firstName: '',
         lastName: '',
         phone: '',
       });
     }
+    setShowPassword(false);
   }, [initialData, open]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,6 +109,24 @@ const UserModal: React.FC<UserModalProps> = ({
   };
 
   const handleSubmit = async () => {
+    // Validações
+    if (!formData.username || !formData.email || !formData.firstName) {
+      toast.error('Preencha todos os campos obrigatórios');
+      return;
+    }
+
+    // Valida senha apenas para criação de novo usuário
+    if (!initialData) {
+      if (!formData.password) {
+        toast.error('Senha é obrigatória');
+        return;
+      }
+      if (formData.password.length < 6) {
+        toast.error('A senha deve ter no mínimo 6 caracteres');
+        return;
+      }
+    }
+
     try {
       await onSubmit(formData);
       onClose();
@@ -151,6 +178,35 @@ const UserModal: React.FC<UserModalProps> = ({
             shrink: true,
           }}
         />
+        {!initialData && (
+          <TextField
+            fullWidth
+            required
+            label="Senha"
+            name="password"
+            type={showPassword ? 'text' : 'password'}
+            value={formData.password}
+            onChange={handleChange}
+            disabled={isLoading}
+            InputLabelProps={{
+              sx: { fontSize: '0.95rem', fontWeight: 500 },
+              shrink: true,
+            }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            helperText="Mínimo 6 caracteres"
+          />
+        )}
         <TextField
           fullWidth
           label="Primeiro Nome"
@@ -195,7 +251,12 @@ const UserModal: React.FC<UserModalProps> = ({
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={isLoading || !formData.email || !formData.firstName}
+          disabled={
+            isLoading || 
+            !formData.email || 
+            !formData.firstName || 
+            (!initialData && !formData.password)
+          }
           size="large"
         >
           {isLoading ? <CircularProgress size={24} /> : 'Salvar'}
@@ -251,7 +312,7 @@ export const UsersPage: React.FC = () => {
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
-        password: 'TempPassword@123', // TODO: Implementar geração de senha segura
+        password: data.password,
         phone: data.phone,
       };
       return userService.create(request);

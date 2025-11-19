@@ -13,6 +13,8 @@ public class UnitOfWork : IUnitOfWork
     public IPermissionRepository Permissions { get; }
     public ITenantRepository Tenants { get; }
     public IAuditLogRepository AuditLogs { get; }
+    public ICompanyRepository Companies { get; }
+    public IWarehouseRepository Warehouses { get; }
 
     public UnitOfWork(
         ApplicationDbContext context,
@@ -20,7 +22,9 @@ public class UnitOfWork : IUnitOfWork
         IRoleRepository roleRepository,
         IPermissionRepository permissionRepository,
         ITenantRepository tenantRepository,
-        IAuditLogRepository auditLogRepository)
+        IAuditLogRepository auditLogRepository,
+        ICompanyRepository companyRepository,
+        IWarehouseRepository warehouseRepository)
     {
         _context = context;
         Users = userRepository;
@@ -28,6 +32,8 @@ public class UnitOfWork : IUnitOfWork
         Permissions = permissionRepository;
         Tenants = tenantRepository;
         AuditLogs = auditLogRepository;
+        Companies = companyRepository;
+        Warehouses = warehouseRepository;
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

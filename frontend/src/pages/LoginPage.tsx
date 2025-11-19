@@ -11,11 +11,219 @@ import {
   CircularProgress,
   InputAdornment,
   IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { RegisterModal, ForgotPasswordModal } from '../components/Auth';
+import { ForgotPasswordModal } from '../components/Auth';
+import { userService } from '../services/api/userApi';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
+
+// ============================================================================
+// Modal de Novo Usuário (Cadastro)
+// ============================================================================
+
+interface UserFormData {
+  username: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+}
+
+interface UserModalProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+const UserModal: React.FC<UserModalProps> = ({ open, onClose }) => {
+  const [formData, setFormData] = useState<UserFormData>({
+    username: '',
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+  });
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const createMutation = useMutation({
+    mutationFn: (data: UserFormData) => userService.create(data),
+    onSuccess: () => {
+      toast.success('Usuário criado com sucesso! Faça login para acessar o sistema.');
+      handleClose();
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Erro ao criar usuário');
+    },
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    if (!formData.username || !formData.email || !formData.password || !formData.firstName) {
+      toast.error('Preencha todos os campos obrigatórios');
+      return;
+    }
+    if (formData.password.length < 6) {
+      toast.error('A senha deve ter no mínimo 6 caracteres');
+      return;
+    }
+    createMutation.mutate(formData);
+  };
+
+  const handleClose = () => {
+    setFormData({
+      username: '',
+      email: '',
+      password: '',
+      firstName: '',
+      lastName: '',
+      phone: '',
+    });
+    setShowPassword(false);
+    onClose();
+  };
+
+  return (
+    <Dialog 
+      open={open} 
+      onClose={handleClose} 
+      maxWidth="sm" 
+      fullWidth
+      PaperProps={{
+        sx: {
+          minHeight: '620px',
+          maxHeight: '90vh',
+        }
+      }}
+    >
+      <DialogTitle sx={{ pb: 1.5, pt: 2.5, fontSize: '1.5rem', fontWeight: 600 }}>
+        Novo Usuário
+      </DialogTitle>
+      <DialogContent sx={{ pt: 3, pb: 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <TextField
+          fullWidth
+          required
+          label="Usuário"
+          name="username"
+          value={formData.username}
+          onChange={handleChange}
+          disabled={createMutation.isPending}
+          InputLabelProps={{
+            sx: { fontSize: '0.95rem', fontWeight: 500 },
+            shrink: true,
+          }}
+          sx={{ mt: 1 }}
+        />
+        <TextField
+          fullWidth
+          required
+          label="Email"
+          name="email"
+          type="email"
+          value={formData.email}
+          onChange={handleChange}
+          disabled={createMutation.isPending}
+          InputLabelProps={{
+            sx: { fontSize: '0.95rem', fontWeight: 500 },
+            shrink: true,
+          }}
+        />
+        <TextField
+          fullWidth
+          required
+          label="Senha"
+          name="password"
+          type={showPassword ? 'text' : 'password'}
+          value={formData.password}
+          onChange={handleChange}
+          disabled={createMutation.isPending}
+          InputLabelProps={{
+            sx: { fontSize: '0.95rem', fontWeight: 500 },
+            shrink: true,
+          }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => setShowPassword(!showPassword)}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+          helperText="Mínimo 6 caracteres"
+        />
+        <TextField
+          fullWidth
+          required
+          label="Primeiro Nome"
+          name="firstName"
+          value={formData.firstName}
+          onChange={handleChange}
+          disabled={createMutation.isPending}
+          InputLabelProps={{
+            sx: { fontSize: '0.95rem', fontWeight: 500 },
+            shrink: true,
+          }}
+        />
+        <TextField
+          fullWidth
+          label="Último Nome"
+          name="lastName"
+          value={formData.lastName}
+          onChange={handleChange}
+          disabled={createMutation.isPending}
+          InputLabelProps={{
+            sx: { fontSize: '0.95rem', fontWeight: 500 },
+            shrink: true,
+          }}
+        />
+        <TextField
+          fullWidth
+          label="Telefone"
+          name="phone"
+          value={formData.phone}
+          onChange={handleChange}
+          disabled={createMutation.isPending}
+          InputLabelProps={{
+            sx: { fontSize: '0.95rem', fontWeight: 500 },
+            shrink: true,
+          }}
+        />
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 3, pt: 2 }}>
+        <Button onClick={handleClose} disabled={createMutation.isPending} size="large">
+          Cancelar
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          disabled={createMutation.isPending || !formData.email || !formData.firstName}
+          size="large"
+        >
+          {createMutation.isPending ? <CircularProgress size={24} /> : 'Salvar'}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 
 // ============================================================================
 // Tela de Login
@@ -220,7 +428,7 @@ export const LoginPage: React.FC = () => {
     </Container>
 
     {/* Modais */}
-    <RegisterModal 
+    <UserModal 
       open={openRegisterModal} 
       onClose={() => setOpenRegisterModal(false)} 
     />

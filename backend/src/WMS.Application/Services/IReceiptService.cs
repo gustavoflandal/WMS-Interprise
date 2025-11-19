@@ -12,7 +12,7 @@ public interface IReceiptService
     /// <summary>
     /// Obtém um recebimento por ID
     /// </summary>
-    Task<Result<ReceiptResponse>> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<Result<ReceiptResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Obtém um recebimento por número
@@ -92,17 +92,17 @@ public interface IReceiptService
     /// <summary>
     /// Atualiza o status de um recebimento
     /// </summary>
-    Task<Result> UpdateStatusAsync(int receiptId, int newStatus, string updatedBy, CancellationToken cancellationToken = default);
+    Task<Result> UpdateStatusAsync(Guid receiptId, int newStatus, string updatedBy, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Confirma um recebimento
     /// </summary>
-    Task<Result> ConfirmAsync(int receiptId, string confirmedBy, CancellationToken cancellationToken = default);
+    Task<Result> ConfirmAsync(Guid receiptId, string confirmedBy, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deleta um recebimento
     /// </summary>
-    Task<Result> DeleteAsync(int id, string deletedBy, CancellationToken cancellationToken = default);
+    Task<Result> DeleteAsync(Guid id, string deletedBy, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Conta quantos recebimentos estão em andamento
@@ -127,5 +127,5 @@ public interface IReceiptService
     /// <summary>
     /// Obtém recebimento com seus itens
     /// </summary>
-    Task<Result<ReceiptResponse>> GetWithItemsAsync(int receiptId, CancellationToken cancellationToken = default);
+    Task<Result<ReceiptResponse>> GetWithItemsAsync(Guid receiptId, CancellationToken cancellationToken = default);
 }

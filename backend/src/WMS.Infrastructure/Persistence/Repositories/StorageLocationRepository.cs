@@ -7,7 +7,7 @@ namespace WMS.Infrastructure.Persistence.Repositories
     /// <summary>
     /// Implementação do repositório para Localizações de Armazenamento
     /// </summary>
-    public class StorageLocationRepository : Repository<StorageLocation>, IStorageLocationRepository
+    public class StorageLocationRepository : BaseRepository<StorageLocation>, IStorageLocationRepository
     {
         public StorageLocationRepository(ApplicationDbContext context) : base(context)
         {
@@ -23,8 +23,8 @@ namespace WMS.Infrastructure.Persistence.Repositories
         {
             return await _context.Set<StorageLocation>()
                 .Where(l => l.WarehouseId == warehouseId &&
-                            (l.Status == (int)LocationStatus.Available ||
-                             l.Status == (int)LocationStatus.PartiallyOccupied) &&
+                            (l.Status == LocationStatus.Available ||
+                             l.Status == LocationStatus.PartiallyOccupied) &&
                             !l.IsBlocked && !l.IsDeleted)
                 .OrderBy(l => l.Code)
                 .ToListAsync();
@@ -42,8 +42,8 @@ namespace WMS.Infrastructure.Persistence.Repositories
         {
             return await _context.Set<StorageLocation>()
                 .Where(l => l.WarehouseId == warehouseId &&
-                            (l.Status == (int)LocationStatus.Occupied ||
-                             l.Status == (int)LocationStatus.PartiallyOccupied) &&
+                            (l.Status == LocationStatus.Occupied ||
+                             l.Status == LocationStatus.PartiallyOccupied) &&
                             !l.IsDeleted)
                 .OrderBy(l => l.Code)
                 .ToListAsync();
@@ -53,7 +53,7 @@ namespace WMS.Infrastructure.Persistence.Repositories
         {
             return await _context.Set<StorageLocation>()
                 .Where(l => l.WarehouseId == warehouseId &&
-                            l.Status == (int)LocationStatus.PartiallyOccupied &&
+                            l.Status == LocationStatus.PartiallyOccupied &&
                             !l.IsDeleted)
                 .OrderBy(l => l.Code)
                 .ToListAsync();
@@ -63,7 +63,7 @@ namespace WMS.Infrastructure.Persistence.Repositories
         {
             return await _context.Set<StorageLocation>()
                 .Where(l => l.WarehouseId == warehouseId &&
-                            (l.Status == (int)LocationStatus.Unavailable || l.IsBlocked) &&
+                            (l.Status == LocationStatus.Unavailable || l.IsBlocked) &&
                             !l.IsDeleted)
                 .OrderBy(l => l.Code)
                 .ToListAsync();
@@ -89,18 +89,18 @@ namespace WMS.Infrastructure.Persistence.Repositories
         {
             return await _context.Set<StorageLocation>()
                 .Where(l => l.WarehouseId == warehouseId &&
-                            (l.Status == (int)LocationStatus.Available ||
-                             l.Status == (int)LocationStatus.PartiallyOccupied) &&
+                            (l.Status == LocationStatus.Available ||
+                             l.Status == LocationStatus.PartiallyOccupied) &&
                             !l.IsBlocked && !l.IsDeleted)
                 .OrderBy(l => l.DistanceFromConsolidationPoint)
                 .Take(limit)
                 .ToListAsync();
         }
 
-        public async Task<bool> CanAccommodateProductAsync(int locationId, int productId, int quantity)
+        public async Task<bool> CanAccommodateProductAsync(Guid locationId, int productId, int quantity)
         {
             var location = await GetByIdAsync(locationId);
-            if (location == null || location.IsBlocked || location.Status == (int)LocationStatus.Unavailable)
+            if (location == null || location.IsBlocked || location.Status == LocationStatus.Unavailable)
                 return false;
 
             // Verificar se a localização está vazia ou contém o mesmo produto
@@ -123,8 +123,8 @@ namespace WMS.Infrastructure.Persistence.Repositories
         {
             return await _context.Set<StorageLocation>()
                 .Where(l => l.WarehouseId == warehouseId &&
-                            (l.Status == (int)LocationStatus.Available ||
-                             l.Status == (int)LocationStatus.PartiallyOccupied) &&
+                            (l.Status == LocationStatus.Available ||
+                             l.Status == LocationStatus.PartiallyOccupied) &&
                             !l.IsBlocked && !l.IsDeleted &&
                             (l.MaxCapacityUnits - l.CurrentQuantity) >= requiredCapacity)
                 .OrderBy(l => l.Code)
@@ -135,8 +135,8 @@ namespace WMS.Infrastructure.Persistence.Repositories
         {
             return await _context.Set<StorageLocation>()
                 .Where(l => l.WarehouseId == warehouseId && (int)l.Zone == zone &&
-                            (l.Status == (int)LocationStatus.Available ||
-                             l.Status == (int)LocationStatus.PartiallyOccupied) &&
+                            (l.Status == LocationStatus.Available ||
+                             l.Status == LocationStatus.PartiallyOccupied) &&
                             !l.IsBlocked && !l.IsDeleted)
                 .OrderBy(l => l.Code)
                 .FirstOrDefaultAsync();
@@ -146,8 +146,8 @@ namespace WMS.Infrastructure.Persistence.Repositories
         {
             return await _context.Set<StorageLocation>()
                 .CountAsync(l => l.WarehouseId == warehouseId &&
-                                 (l.Status == (int)LocationStatus.Available ||
-                                  l.Status == (int)LocationStatus.PartiallyOccupied) &&
+                                 (l.Status == LocationStatus.Available ||
+                                  l.Status == LocationStatus.PartiallyOccupied) &&
                                  !l.IsBlocked && !l.IsDeleted);
         }
 
@@ -155,8 +155,8 @@ namespace WMS.Infrastructure.Persistence.Repositories
         {
             return await _context.Set<StorageLocation>()
                 .CountAsync(l => l.WarehouseId == warehouseId &&
-                                 (l.Status == (int)LocationStatus.Occupied ||
-                                  l.Status == (int)LocationStatus.PartiallyOccupied) &&
+                                 (l.Status == LocationStatus.Occupied ||
+                                  l.Status == LocationStatus.PartiallyOccupied) &&
                                  !l.IsDeleted);
         }
 
@@ -170,17 +170,17 @@ namespace WMS.Infrastructure.Persistence.Repositories
             return total == 0 ? 0 : (decimal)occupied / total * 100;
         }
 
-        public async Task<bool> UpdateStatusAsync(int locationId, int newStatus)
+        public async Task<bool> UpdateStatusAsync(Guid locationId, int newStatus)
         {
             var location = await GetByIdAsync(locationId);
             if (location == null)
                 return false;
 
-            location.Status = newStatus;
+            location.Status = (LocationStatus)newStatus;
             return true;
         }
 
-        public async Task<bool> BlockLocationAsync(int locationId, string reason)
+        public async Task<bool> BlockLocationAsync(Guid locationId, string reason)
         {
             var location = await GetByIdAsync(locationId);
             if (location == null)
@@ -188,10 +188,11 @@ namespace WMS.Infrastructure.Persistence.Repositories
 
             location.IsBlocked = true;
             location.BlockReason = reason;
+            location.Status = LocationStatus.Unavailable;
             return true;
         }
 
-        public async Task<bool> UnblockLocationAsync(int locationId)
+        public async Task<bool> UnblockLocationAsync(Guid locationId)
         {
             var location = await GetByIdAsync(locationId);
             if (location == null)
@@ -199,10 +200,11 @@ namespace WMS.Infrastructure.Persistence.Repositories
 
             location.IsBlocked = false;
             location.BlockReason = null;
+            location.Status = LocationStatus.Available;
             return true;
         }
 
-        public async Task<bool> RecordAccessAsync(int locationId)
+        public async Task<bool> RecordAccessAsync(Guid locationId)
         {
             var location = await GetByIdAsync(locationId);
             if (location == null)

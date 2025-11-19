@@ -12,7 +12,7 @@ public interface IStorageLocationService
     /// <summary>
     /// Obtém uma localização por ID
     /// </summary>
-    Task<Result<StorageLocationResponse>> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<Result<StorageLocationResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Obtém uma localização por código
@@ -87,32 +87,32 @@ public interface IStorageLocationService
     /// <summary>
     /// Atualiza o status de uma localização
     /// </summary>
-    Task<Result> UpdateStatusAsync(int locationId, int newStatus, string updatedBy, CancellationToken cancellationToken = default);
+    Task<Result> UpdateStatusAsync(Guid locationId, int newStatus, string updatedBy, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Bloqueia uma localização
     /// </summary>
-    Task<Result> BlockLocationAsync(int locationId, string reason, string blockedBy, CancellationToken cancellationToken = default);
+    Task<Result> BlockLocationAsync(Guid locationId, string reason, string blockedBy, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Desbloqueia uma localização
     /// </summary>
-    Task<Result> UnblockLocationAsync(int locationId, string unblockedBy, CancellationToken cancellationToken = default);
+    Task<Result> UnblockLocationAsync(Guid locationId, string unblockedBy, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Registra acesso a uma localização
     /// </summary>
-    Task<Result> RecordAccessAsync(int locationId, string accessedBy, CancellationToken cancellationToken = default);
+    Task<Result> RecordAccessAsync(Guid locationId, string accessedBy, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Verifica se uma localização pode acomodar um produto
     /// </summary>
-    Task<Result<bool>> CanAccommodateProductAsync(int locationId, int productId, int quantity, CancellationToken cancellationToken = default);
+    Task<Result<bool>> CanAccommodateProductAsync(Guid locationId, int productId, int quantity, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deleta uma localização
     /// </summary>
-    Task<Result> DeleteAsync(int id, string deletedBy, CancellationToken cancellationToken = default);
+    Task<Result> DeleteAsync(Guid id, string deletedBy, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Conta localizações disponíveis

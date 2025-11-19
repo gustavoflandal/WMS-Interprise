@@ -19,9 +19,9 @@ public class StorageLocationService : IStorageLocationService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<StorageLocationResponse>> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Result<StorageLocationResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var location = await _unitOfWork.StorageLocations.GetByIdAsync(id);
+        var location = await _unitOfWork.StorageLocations.GetByIdAsync(id, cancellationToken);
         if (location == null)
             return Result<StorageLocationResponse>.Failure("Localização não encontrada");
 
@@ -45,7 +45,7 @@ public class StorageLocationService : IStorageLocationService
         if (warehouseId <= 0)
             return Result<IEnumerable<StorageLocationResponse>>.Failure("ID do armazém inválido");
 
-        var locations = await _unitOfWork.StorageLocations.GetAllAsync();
+        var locations = await _unitOfWork.StorageLocations.GetAllAsync(cancellationToken);
         var responses = locations.Where(l => l.WarehouseId == warehouseId).Select(MapToResponse);
         return Result<IEnumerable<StorageLocationResponse>>.Success(responses);
     }
@@ -207,75 +207,79 @@ public class StorageLocationService : IStorageLocationService
             IdealHumidity = request.MinHumidity
         };
 
-        await _unitOfWork.StorageLocations.AddAsync(location);
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.StorageLocations.AddAsync(location, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<StorageLocationResponse>.Success(MapToResponse(location));
     }
 
-    public async Task<Result> UpdateStatusAsync(int locationId, int newStatus, string updatedBy, CancellationToken cancellationToken = default)
+    public async Task<Result> UpdateStatusAsync(Guid locationId, int newStatus, string updatedBy, CancellationToken cancellationToken = default)
     {
-        if (locationId <= 0)
-            return Result.Failure("ID da localização inválido");
-
-        if (newStatus < 0 || newStatus > 3)
+        if (newStatus < 1 || newStatus > 4)
             return Result.Failure("Status inválido");
 
-        var updated = await _unitOfWork.StorageLocations.UpdateStatusAsync(locationId, newStatus);
-        if (!updated)
+        var location = await _unitOfWork.StorageLocations.GetByIdAsync(locationId, cancellationToken);
+        if (location == null)
             return Result.Failure("Localização não encontrada");
 
-        await _unitOfWork.SaveChangesAsync();
+        location.Status = (LocationStatus)newStatus;
+        await _unitOfWork.StorageLocations.UpdateAsync(location, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
         return Result.Success();
     }
 
-    public async Task<Result> BlockLocationAsync(int locationId, string reason, string blockedBy, CancellationToken cancellationToken = default)
+    public async Task<Result> BlockLocationAsync(Guid locationId, string reason, string blockedBy, CancellationToken cancellationToken = default)
     {
-        if (locationId <= 0)
-            return Result.Failure("ID da localização inválido");
-
         if (string.IsNullOrWhiteSpace(reason))
             return Result.Failure("Motivo do bloqueio é obrigatório");
 
-        var blocked = await _unitOfWork.StorageLocations.BlockLocationAsync(locationId, reason);
-        if (!blocked)
+        var location = await _unitOfWork.StorageLocations.GetByIdAsync(locationId, cancellationToken);
+        if (location == null)
             return Result.Failure("Localização não encontrada");
 
-        await _unitOfWork.SaveChangesAsync();
+        location.IsBlocked = true;
+        location.BlockReason = reason;
+        location.Status = LocationStatus.Unavailable;
+
+        await _unitOfWork.StorageLocations.UpdateAsync(location, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
         return Result.Success();
     }
 
-    public async Task<Result> UnblockLocationAsync(int locationId, string unblockedBy, CancellationToken cancellationToken = default)
+    public async Task<Result> UnblockLocationAsync(Guid locationId, string unblockedBy, CancellationToken cancellationToken = default)
     {
-        if (locationId <= 0)
-            return Result.Failure("ID da localização inválido");
-
-        var unblocked = await _unitOfWork.StorageLocations.UnblockLocationAsync(locationId);
-        if (!unblocked)
+        var location = await _unitOfWork.StorageLocations.GetByIdAsync(locationId, cancellationToken);
+        if (location == null)
             return Result.Failure("Localização não encontrada");
 
-        await _unitOfWork.SaveChangesAsync();
+        location.IsBlocked = false;
+        location.BlockReason = null;
+
+        await _unitOfWork.StorageLocations.UpdateAsync(location, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
         return Result.Success();
     }
 
-    public async Task<Result> RecordAccessAsync(int locationId, string accessedBy, CancellationToken cancellationToken = default)
+    public async Task<Result> RecordAccessAsync(Guid locationId, string accessedBy, CancellationToken cancellationToken = default)
     {
-        if (locationId <= 0)
-            return Result.Failure("ID da localização inválido");
-
-        var recorded = await _unitOfWork.StorageLocations.RecordAccessAsync(locationId);
-        if (!recorded)
+        var location = await _unitOfWork.StorageLocations.GetByIdAsync(locationId, cancellationToken);
+        if (location == null)
             return Result.Failure("Localização não encontrada");
 
-        await _unitOfWork.SaveChangesAsync();
+        location.AccessCount++;
+        location.LastRemovalDate = DateTime.UtcNow;
+
+        await _unitOfWork.StorageLocations.UpdateAsync(location, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
         return Result.Success();
     }
 
-    public async Task<Result<bool>> CanAccommodateProductAsync(int locationId, int productId, int quantity, CancellationToken cancellationToken = default)
+    public async Task<Result<bool>> CanAccommodateProductAsync(Guid locationId, int productId, int quantity, CancellationToken cancellationToken = default)
     {
-        if (locationId <= 0)
-            return Result<bool>.Failure("ID da localização inválido");
-
         if (productId <= 0)
             return Result<bool>.Failure("ID do produto inválido");
 
@@ -286,15 +290,14 @@ public class StorageLocationService : IStorageLocationService
         return Result<bool>.Success(canAccommodate);
     }
 
-    public async Task<Result> DeleteAsync(int id, string deletedBy, CancellationToken cancellationToken = default)
+    public async Task<Result> DeleteAsync(Guid id, string deletedBy, CancellationToken cancellationToken = default)
     {
-        var location = await _unitOfWork.StorageLocations.GetByIdAsync(id);
+        var location = await _unitOfWork.StorageLocations.GetByIdAsync(id, cancellationToken);
         if (location == null)
             return Result.Failure("Localização não encontrada");
 
-        location.DeletedBy = deletedBy;
-        await _unitOfWork.StorageLocations.DeleteAsync(location);
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.StorageLocations.DeleteAsync(location, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }
@@ -330,7 +333,7 @@ public class StorageLocationService : IStorageLocationService
     {
         return new StorageLocationResponse
         {
-            Id = location.Id.GetHashCode(), // Convert Guid to int
+            Id = location.Id,
             WarehouseId = location.WarehouseId,
             Code = location.Code,
             Zone = (int)location.Zone,

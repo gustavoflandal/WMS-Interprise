@@ -18,7 +18,7 @@ public class ASNService : IASNService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<ASNResponse>> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Result<ASNResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var asn = await _unitOfWork.ASNs.GetByIdAsync(id, cancellationToken);
         if (asn == null)
@@ -185,27 +185,24 @@ public class ASNService : IASNService
         return Result<ASNResponse>.Success(MapToResponse(asn));
     }
 
-    public async Task<Result> UpdateStatusAsync(int asnId, int newStatus, string updatedBy, CancellationToken cancellationToken = default)
+    public async Task<Result> UpdateStatusAsync(Guid asnId, int newStatus, string updatedBy, CancellationToken cancellationToken = default)
     {
-        if (asnId <= 0)
-            return Result.Failure("ID da ASN inválido");
-
         if (newStatus < 0 || newStatus > 7)
             return Result.Failure("Status inválido");
 
-        var updated = await _unitOfWork.ASNs.UpdateStatusAsync(asnId, newStatus);
-        if (!updated)
+        var asn = await _unitOfWork.ASNs.GetByIdAsync(asnId, cancellationToken);
+        if (asn == null)
             return Result.Failure("ASN não encontrada");
 
+        asn.Status = (ASNStatus)newStatus;
+        await _unitOfWork.ASNs.UpdateAsync(asn, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
         return Result.Success();
     }
 
-    public async Task<Result> MarkAsInspectedAsync(int asnId, int inspectionResult, string inspectedBy, CancellationToken cancellationToken = default)
+    public async Task<Result> MarkAsInspectedAsync(Guid asnId, int inspectionResult, string inspectedBy, CancellationToken cancellationToken = default)
     {
-        if (asnId <= 0)
-            return Result.Failure("ID da ASN inválido");
-
         if (inspectionResult < 0 || inspectionResult > 3)
             return Result.Failure("Resultado de inspeção inválido");
 
@@ -222,7 +219,7 @@ public class ASNService : IASNService
         return Result.Success();
     }
 
-    public async Task<Result> DeleteAsync(int id, string deletedBy, CancellationToken cancellationToken = default)
+    public async Task<Result> DeleteAsync(Guid id, string deletedBy, CancellationToken cancellationToken = default)
     {
         var asn = await _unitOfWork.ASNs.GetByIdAsync(id, cancellationToken);
         if (asn == null)
@@ -252,11 +249,8 @@ public class ASNService : IASNService
         return Result<int>.Success(count);
     }
 
-    public async Task<Result<ASNResponse>> GetWithItemsAsync(int asnId, CancellationToken cancellationToken = default)
+    public async Task<Result<ASNResponse>> GetWithItemsAsync(Guid asnId, CancellationToken cancellationToken = default)
     {
-        if (asnId <= 0)
-            return Result<ASNResponse>.Failure("ID da ASN inválido");
-
         var asn = await _unitOfWork.ASNs.GetWithItemsAsync(asnId);
         if (asn == null)
             return Result<ASNResponse>.Failure("ASN não encontrada");
@@ -286,7 +280,7 @@ public class ASNService : IASNService
             ExternalReference = asn.ExternalReference,
             OriginWarehouseId = asn.OriginWarehouseId,
             CreatedAt = asn.CreatedAt,
-            UpdatedAt = asn.UpdatedAt
+            UpdatedAt = asn.UpdatedAt ?? DateTime.UtcNow
         };
     }
 }

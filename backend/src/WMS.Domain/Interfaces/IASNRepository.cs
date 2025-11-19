@@ -91,12 +91,12 @@ namespace WMS.Domain.Interfaces
         /// <summary>
         /// Atualiza o status de uma ASN
         /// </summary>
-        Task<bool> UpdateStatusAsync(int asnId, int newStatus);
+        Task<bool> UpdateStatusAsync(Guid asnId, int newStatus);
 
         /// <summary>
         /// Obtém incluindo seus items
         /// </summary>
-        Task<ASN?> GetWithItemsAsync(int asnId);
+        Task<ASN?> GetWithItemsAsync(Guid asnId);
 
         /// <summary>
         /// Obtém para transferência entre armazéns

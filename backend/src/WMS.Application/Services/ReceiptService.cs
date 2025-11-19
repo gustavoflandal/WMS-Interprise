@@ -18,9 +18,9 @@ public class ReceiptService : IReceiptService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<ReceiptResponse>> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Result<ReceiptResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var receipt = await _unitOfWork.Receipts.GetByIdAsync(id);
+        var receipt = await _unitOfWork.Receipts.GetByIdAsync(id, cancellationToken);
         if (receipt == null)
             return Result<ReceiptResponse>.Failure("Recebimento não encontrado");
 
@@ -44,7 +44,7 @@ public class ReceiptService : IReceiptService
         if (warehouseId <= 0)
             return Result<IEnumerable<ReceiptResponse>>.Failure("ID do armazém inválido");
 
-        var receipts = await _unitOfWork.Receipts.GetAllAsync();
+        var receipts = await _unitOfWork.Receipts.GetAllAsync(cancellationToken);
         var responses = receipts.Where(r => r.WarehouseId == warehouseId).Select(MapToResponse);
         return Result<IEnumerable<ReceiptResponse>>.Success(responses);
     }
@@ -194,7 +194,6 @@ public class ReceiptService : IReceiptService
         if (request.OperatorId <= 0)
             return Result<ReceiptResponse>.Failure("ID do operador inválido");
 
-        // Gerar próximo número de recebimento
         var nextNumber = await _unitOfWork.Receipts.GetNextReceiptNumberAsync(request.WarehouseId);
 
         var receipt = new ReceiptDocumentation
@@ -214,56 +213,51 @@ public class ReceiptService : IReceiptService
             HasDiscrepancies = false
         };
 
-        await _unitOfWork.Receipts.AddAsync(receipt);
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.Receipts.AddAsync(receipt, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<ReceiptResponse>.Success(MapToResponse(receipt));
     }
 
-    public async Task<Result> UpdateStatusAsync(int receiptId, int newStatus, string updatedBy, CancellationToken cancellationToken = default)
+    public async Task<Result> UpdateStatusAsync(Guid receiptId, int newStatus, string updatedBy, CancellationToken cancellationToken = default)
     {
-        if (receiptId <= 0)
-            return Result.Failure("ID do recebimento inválido");
-
         if (newStatus < 0 || newStatus > 5)
             return Result.Failure("Status inválido");
 
-        var updated = await _unitOfWork.Receipts.UpdateStatusAsync(receiptId, newStatus);
-        if (!updated)
+        var receipt = await _unitOfWork.Receipts.GetByIdAsync(receiptId, cancellationToken);
+        if (receipt == null)
             return Result.Failure("Recebimento não encontrado");
 
-        await _unitOfWork.SaveChangesAsync();
+        receipt.Status = (ReceiptStatus)newStatus;
+        await _unitOfWork.Receipts.UpdateAsync(receipt, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
         return Result.Success();
     }
 
-    public async Task<Result> ConfirmAsync(int receiptId, string confirmedBy, CancellationToken cancellationToken = default)
+    public async Task<Result> ConfirmAsync(Guid receiptId, string confirmedBy, CancellationToken cancellationToken = default)
     {
-        if (receiptId <= 0)
-            return Result.Failure("ID do recebimento inválido");
-
-        var receipt = await _unitOfWork.Receipts.GetByIdAsync(receiptId);
+        var receipt = await _unitOfWork.Receipts.GetByIdAsync(receiptId, cancellationToken);
         if (receipt == null)
             return Result.Failure("Recebimento não encontrado");
 
         receipt.Status = ReceiptStatus.Confirmed;
         receipt.ConfirmedAt = DateTime.UtcNow;
-        receipt.UpdatedBy = confirmedBy;
 
-        await _unitOfWork.Receipts.UpdateAsync(receipt);
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.Receipts.UpdateAsync(receipt, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }
 
-    public async Task<Result> DeleteAsync(int id, string deletedBy, CancellationToken cancellationToken = default)
+    public async Task<Result> DeleteAsync(Guid id, string deletedBy, CancellationToken cancellationToken = default)
     {
-        var receipt = await _unitOfWork.Receipts.GetByIdAsync(id);
+        var receipt = await _unitOfWork.Receipts.GetByIdAsync(id, cancellationToken);
         if (receipt == null)
             return Result.Failure("Recebimento não encontrado");
 
-        receipt.DeletedBy = deletedBy;
-        await _unitOfWork.Receipts.DeleteAsync(receipt);
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.Receipts.DeleteAsync(receipt, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }
@@ -304,11 +298,8 @@ public class ReceiptService : IReceiptService
         return Result<int>.Success(average);
     }
 
-    public async Task<Result<ReceiptResponse>> GetWithItemsAsync(int receiptId, CancellationToken cancellationToken = default)
+    public async Task<Result<ReceiptResponse>> GetWithItemsAsync(Guid receiptId, CancellationToken cancellationToken = default)
     {
-        if (receiptId <= 0)
-            return Result<ReceiptResponse>.Failure("ID do recebimento inválido");
-
         var receipt = await _unitOfWork.Receipts.GetWithItemsAsync(receiptId);
         if (receipt == null)
             return Result<ReceiptResponse>.Failure("Recebimento não encontrado");
@@ -320,7 +311,7 @@ public class ReceiptService : IReceiptService
     {
         return new ReceiptResponse
         {
-            Id = receipt.Id.GetHashCode(), // Convert Guid to int
+            Id = receipt.Id,
             ReceiptNumber = receipt.ReceiptNumber,
             WarehouseId = receipt.WarehouseId,
             AsnId = receipt.AsnId,

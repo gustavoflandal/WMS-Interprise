@@ -5,7 +5,7 @@ namespace WMS.Application.DTOs.Responses;
 /// </summary>
 public class ProductResponse
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string Sku { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public int Category { get; set; }

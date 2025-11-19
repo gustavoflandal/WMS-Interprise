@@ -101,7 +101,7 @@ namespace WMS.Domain.Interfaces
         /// <summary>
         /// Obtém incluindo seus items
         /// </summary>
-        Task<ReceiptDocumentation?> GetWithItemsAsync(int receiptId);
+        Task<ReceiptDocumentation?> GetWithItemsAsync(Guid receiptId);
 
         /// <summary>
         /// Obtém recebimentos não fechados (rascunho ou em progresso)
@@ -111,7 +111,7 @@ namespace WMS.Domain.Interfaces
         /// <summary>
         /// Atualiza o status de um recebimento
         /// </summary>
-        Task<bool> UpdateStatusAsync(int receiptId, int newStatus);
+        Task<bool> UpdateStatusAsync(Guid receiptId, int newStatus);
 
         /// <summary>
         /// Obtém recebimentos em quarentena

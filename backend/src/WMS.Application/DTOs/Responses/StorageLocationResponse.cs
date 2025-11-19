@@ -5,7 +5,7 @@ namespace WMS.Application.DTOs.Responses;
 /// </summary>
 public class StorageLocationResponse
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public int WarehouseId { get; set; }
     public string Code { get; set; } = string.Empty;
     public int Zone { get; set; }

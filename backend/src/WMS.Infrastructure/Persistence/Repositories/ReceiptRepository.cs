@@ -7,7 +7,7 @@ namespace WMS.Infrastructure.Persistence.Repositories
     /// <summary>
     /// Implementação do repositório para Documentação de Recebimento
     /// </summary>
-    public class ReceiptRepository : Repository<ReceiptDocumentation>, IReceiptRepository
+    public class ReceiptRepository : BaseRepository<ReceiptDocumentation>, IReceiptRepository
     {
         public ReceiptRepository(ApplicationDbContext context) : base(context)
         {
@@ -184,7 +184,7 @@ namespace WMS.Infrastructure.Persistence.Repositories
             return (int)receipts.Average(r => r.TotalReceiptTimeMinutes ?? 0);
         }
 
-        public async Task<ReceiptDocumentation?> GetWithItemsAsync(int receiptId)
+        public async Task<ReceiptDocumentation?> GetWithItemsAsync(Guid receiptId)
         {
             return await _context.Set<ReceiptDocumentation>()
                 .Include(r => r.Items)
@@ -202,7 +202,7 @@ namespace WMS.Infrastructure.Persistence.Repositories
                 .ToListAsync();
         }
 
-        public async Task<bool> UpdateStatusAsync(int receiptId, int newStatus)
+        public async Task<bool> UpdateStatusAsync(Guid receiptId, int newStatus)
         {
             var receipt = await GetByIdAsync(receiptId);
             if (receipt == null)

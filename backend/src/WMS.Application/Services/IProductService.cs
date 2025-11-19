@@ -12,7 +12,7 @@ public interface IProductService
     /// <summary>
     /// Obtém um produto por ID
     /// </summary>
-    Task<Result<ProductResponse>> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<Result<ProductResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Obtém todos os produtos
@@ -72,12 +72,12 @@ public interface IProductService
     /// <summary>
     /// Atualiza um produto existente
     /// </summary>
-    Task<Result<ProductResponse>> UpdateAsync(int id, UpdateProductRequest request, string updatedBy, CancellationToken cancellationToken = default);
+    Task<Result<ProductResponse>> UpdateAsync(Guid id, UpdateProductRequest request, string updatedBy, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deleta um produto
     /// </summary>
-    Task<Result> DeleteAsync(int id, string deletedBy, CancellationToken cancellationToken = default);
+    Task<Result> DeleteAsync(Guid id, string deletedBy, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Verifica se um SKU já existe

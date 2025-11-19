@@ -57,7 +57,7 @@ namespace WMS.Domain.Interfaces
         /// <summary>
         /// Verifica se uma localização está disponível e pode armazenar um produto
         /// </summary>
-        Task<bool> CanAccommodateProductAsync(int locationId, int productId, int quantity);
+        Task<bool> CanAccommodateProductAsync(Guid locationId, int productId, int quantity);
 
         /// <summary>
         /// Obtém localizações que armazenam um produto específico
@@ -92,22 +92,22 @@ namespace WMS.Domain.Interfaces
         /// <summary>
         /// Atualiza o status de uma localização
         /// </summary>
-        Task<bool> UpdateStatusAsync(int locationId, int newStatus);
+        Task<bool> UpdateStatusAsync(Guid locationId, int newStatus);
 
         /// <summary>
         /// Bloqueia uma localização
         /// </summary>
-        Task<bool> BlockLocationAsync(int locationId, string reason);
+        Task<bool> BlockLocationAsync(Guid locationId, string reason);
 
         /// <summary>
         /// Desbloqueia uma localização
         /// </summary>
-        Task<bool> UnblockLocationAsync(int locationId);
+        Task<bool> UnblockLocationAsync(Guid locationId);
 
         /// <summary>
         /// Registra um acesso à localização
         /// </summary>
-        Task<bool> RecordAccessAsync(int locationId);
+        Task<bool> RecordAccessAsync(Guid locationId);
 
         /// <summary>
         /// Obtém localizações órfãs (ocupadas mas sem produto válido)

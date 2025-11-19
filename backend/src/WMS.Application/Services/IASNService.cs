@@ -12,7 +12,7 @@ public interface IASNService
     /// <summary>
     /// Obtém um ASN por ID
     /// </summary>
-    Task<Result<ASNResponse>> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<Result<ASNResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Obtém um ASN por número
@@ -77,17 +77,17 @@ public interface IASNService
     /// <summary>
     /// Atualiza o status de um ASN
     /// </summary>
-    Task<Result> UpdateStatusAsync(int asnId, int newStatus, string updatedBy, CancellationToken cancellationToken = default);
+    Task<Result> UpdateStatusAsync(Guid asnId, int newStatus, string updatedBy, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Marca um ASN como inspecionado
     /// </summary>
-    Task<Result> MarkAsInspectedAsync(int asnId, int inspectionResult, string inspectedBy, CancellationToken cancellationToken = default);
+    Task<Result> MarkAsInspectedAsync(Guid asnId, int inspectionResult, string inspectedBy, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deleta um ASN
     /// </summary>
-    Task<Result> DeleteAsync(int id, string deletedBy, CancellationToken cancellationToken = default);
+    Task<Result> DeleteAsync(Guid id, string deletedBy, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Conta quantos ASNs estão pendentes
@@ -102,5 +102,5 @@ public interface IASNService
     /// <summary>
     /// Obtém ASN com seus itens
     /// </summary>
-    Task<Result<ASNResponse>> GetWithItemsAsync(int asnId, CancellationToken cancellationToken = default);
+    Task<Result<ASNResponse>> GetWithItemsAsync(Guid asnId, CancellationToken cancellationToken = default);
 }

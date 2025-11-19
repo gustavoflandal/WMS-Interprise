@@ -7,7 +7,7 @@ namespace WMS.Infrastructure.Persistence.Repositories
     /// <summary>
     /// Implementação do repositório para Produtos (SKUs)
     /// </summary>
-    public class ProductRepository : Repository<Product>, IProductRepository
+    public class ProductRepository : BaseRepository<Product>, IProductRepository
     {
         public ProductRepository(ApplicationDbContext context) : base(context)
         {

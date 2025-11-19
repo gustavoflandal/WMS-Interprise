@@ -19,7 +19,7 @@ public class ProductService : IProductService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<ProductResponse>> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Result<ProductResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var product = await _unitOfWork.Products.GetByIdAsync(id, cancellationToken);
         if (product == null)
@@ -114,7 +114,6 @@ public class ProductService : IProductService
 
     public async Task<Result<ProductResponse>> CreateAsync(CreateProductRequest request, int tenantId, string createdBy, CancellationToken cancellationToken = default)
     {
-        // Validar se SKU já existe
         if (await _unitOfWork.Products.SkuExistsAsync(request.Sku, tenantId))
             return Result<ProductResponse>.Failure("Já existe um produto com este SKU");
 
@@ -150,7 +149,7 @@ public class ProductService : IProductService
         return Result<ProductResponse>.Success(MapToResponse(product));
     }
 
-    public async Task<Result<ProductResponse>> UpdateAsync(int id, UpdateProductRequest request, string updatedBy, CancellationToken cancellationToken = default)
+    public async Task<Result<ProductResponse>> UpdateAsync(Guid id, UpdateProductRequest request, string updatedBy, CancellationToken cancellationToken = default)
     {
         var product = await _unitOfWork.Products.GetByIdAsync(id, cancellationToken);
         if (product == null)
@@ -222,7 +221,7 @@ public class ProductService : IProductService
         return Result<ProductResponse>.Success(MapToResponse(product));
     }
 
-    public async Task<Result> DeleteAsync(int id, string deletedBy, CancellationToken cancellationToken = default)
+    public async Task<Result> DeleteAsync(Guid id, string deletedBy, CancellationToken cancellationToken = default)
     {
         var product = await _unitOfWork.Products.GetByIdAsync(id, cancellationToken);
         if (product == null)
@@ -270,7 +269,7 @@ public class ProductService : IProductService
             UnitPrice = product.UnitPrice,
             IsActive = product.IsActive,
             CreatedAt = product.CreatedAt,
-            UpdatedAt = product.UpdatedAt
+            UpdatedAt = product.UpdatedAt ?? DateTime.UtcNow
         };
     }
 }

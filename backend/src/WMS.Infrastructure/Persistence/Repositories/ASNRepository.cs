@@ -7,7 +7,7 @@ namespace WMS.Infrastructure.Persistence.Repositories
     /// <summary>
     /// Implementação do repositório para ASN (Advance Shipping Notice)
     /// </summary>
-    public class ASNRepository : Repository<ASN>, IASNRepository
+    public class ASNRepository : BaseRepository<ASN>, IASNRepository
     {
         public ASNRepository(ApplicationDbContext context) : base(context)
         {
@@ -160,7 +160,7 @@ namespace WMS.Infrastructure.Persistence.Repositories
                 .ToListAsync();
         }
 
-        public async Task<bool> UpdateStatusAsync(int asnId, int newStatus)
+        public async Task<bool> UpdateStatusAsync(Guid asnId, int newStatus)
         {
             var asn = await GetByIdAsync(asnId);
             if (asn == null)
@@ -170,7 +170,7 @@ namespace WMS.Infrastructure.Persistence.Repositories
             return true;
         }
 
-        public async Task<ASN?> GetWithItemsAsync(int asnId)
+        public async Task<ASN?> GetWithItemsAsync(Guid asnId)
         {
             return await _context.Set<ASN>()
                 .Include(a => a.Items)

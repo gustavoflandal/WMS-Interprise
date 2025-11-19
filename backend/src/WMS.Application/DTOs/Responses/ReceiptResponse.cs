@@ -5,7 +5,7 @@ namespace WMS.Application.DTOs.Responses;
 /// </summary>
 public class ReceiptResponse
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string ReceiptNumber { get; set; } = string.Empty;
     public int WarehouseId { get; set; }
     public int? AsnId { get; set; }

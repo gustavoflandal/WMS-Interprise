@@ -143,6 +143,12 @@ try
     builder.Services.AddScoped<IWarehouseService, WarehouseService>();
     builder.Services.AddScoped<ICustomerService, CustomerService>();
 
+    // Receiving Module Services (RF-001)
+    builder.Services.AddScoped<IProductService, ProductService>();
+    builder.Services.AddScoped<IASNService, ASNService>();
+    builder.Services.AddScoped<IReceiptService, ReceiptService>();
+    builder.Services.AddScoped<IStorageLocationService, StorageLocationService>();
+
     // AutoMapper
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

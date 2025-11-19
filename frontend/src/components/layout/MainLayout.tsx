@@ -33,6 +33,9 @@ import {
   Security as SecurityIcon,
   Business as BusinessIcon,
   Warehouse as WarehouseIcon,
+  Inventory as InventoryIcon,
+  Shield as ShieldIcon,
+  LocalShipping as LocalShippingIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -102,6 +105,25 @@ export const MainLayout: React.FC = () => {
           path: '/customers',
           color: '#ff5722',
         },
+        {
+          label: 'Produtos',
+          icon: <InventoryIcon sx={{ color: '#ff9800' }} />,
+          path: '/products',
+          color: '#ff9800',
+        },
+      ],
+    },
+    {
+      label: 'Recebimento',
+      icon: <LocalShippingIcon sx={{ color: '#00bcd4' }} />,
+      color: '#00bcd4',
+      submenu: [
+        {
+          label: 'ASN (Avisos de Remessa)',
+          icon: <LocalShippingIcon sx={{ color: '#00acc1' }} />,
+          path: '/asn',
+          color: '#00acc1',
+        },
       ],
     },
     {
@@ -121,8 +143,12 @@ export const MainLayout: React.FC = () => {
           path: '/users/activities',
           color: '#ff9800',
         },
-        {
-          label: 'Permissões',
+        {          label: 'Papéis/Funções',
+          icon: <ShieldIcon sx={{ color: '#ff9800' }} />,
+          path: '/users/roles',
+          color: '#ff9800',
+        },
+        {          label: 'Permissões',
           icon: <SecurityIcon sx={{ color: '#f44336' }} />,
           path: '/users/permissions',
           color: '#f44336',
